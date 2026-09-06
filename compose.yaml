@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: workflow-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: workflow_engine
+      POSTGRES_USER: engine_user
+      POSTGRES_PASSWORD: secret_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: workflow-queue
+    ports:
+      - "6379:6379"
+
+  appsmith:
+    image: appsmith/appsmith-ce
+    container_name: workflow-ui
+    ports:
+      - "8080:80"
+    environment:
+      - APPSMITH_ENCRYPTION_SALT=secret_salt
+      - APPSMITH_ENCRYPTION_PASSWORD=secret_password
+    volumes:
+      - appsmith_stacks:/appsmith-stacks
+
+volumes:
+  postgres_data:
+  appsmith_stacks:
