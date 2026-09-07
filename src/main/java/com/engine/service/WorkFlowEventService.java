@@ -35,29 +35,23 @@ public class WorkFlowEventService {
                 .orElse(1);
 
         WorkFlowEvent event = new WorkFlowEvent(null, workflowId, sequenceNumber, eventType, payload, Instant.now());
-        return workFlowEventRepository.save(event);
+        return workFlowEventRepository.saveAndFlush(event);
     }
 
+    @Transactional (readOnly = true)
     public List<WorkFlowEvent> getEventsByWorkflowId(String workflowId) {
         return workFlowEventRepository.findByWorkflowIdOrderBySequenceNumberAsc(workflowId);
     }
 
     public WorkFlowEvent recordActivity(String workflowId, String activityName, WorkFlowEvent.EventType eventType, String payload ) {
-        List<WorkFlowEvent> history = workFlowEventRepository.findByWorkflowIdOrderBySequenceNumberAsc(workflowId);
-        int nextSequence = history.size() + 1;
-
-        WorkFlowEvent event = new WorkFlowEvent(null, workflowId, nextSequence, eventType, payload, Instant.now());
-        return workFlowEventRepository.save(event);
+        return appendEvent(workflowId, eventType, payload);
     }
 
     public WorkFlowEvent completeWorkFlow(String workflowId, String payload){
-        List<WorkFlowEvent> history = workFlowEventRepository.findByWorkflowIdOrderBySequenceNumberAsc(workflowId);
-        int nextSequence = history.size() + 1;
-
-        WorkFlowEvent event = new WorkFlowEvent(null, workflowId, nextSequence, WorkFlowEvent.EventType.WORKFLOW_COMPLETED, payload, Instant.now());
-        return workFlowEventRepository.save(event);
+        return appendEvent(workflowId, WorkFlowEvent.EventType.WORKFLOW_COMPLETED, payload);
     }
 
+    @Transactional (readOnly = true)
     public WorkFlowState getWorkFlowState(String workflowId){
         List<WorkFlowEvent> events = workFlowEventRepository.findByWorkflowIdOrderBySequenceNumberAsc(workflowId);
 
@@ -91,30 +85,10 @@ public class WorkFlowEventService {
     }
 
     public WorkFlowEvent failActivity(String workflowId, String activityName, String failureDetails){
-        List<WorkFlowEvent> history = workFlowEventRepository.findByWorkflowIdOrderBySequenceNumberAsc(workflowId);
-
-        if(history.isEmpty()){
-            throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "Workflow " + workflowId + " not found"
-            );
-        }
-        int nextSequence = history.size() + 1;
-
-        WorkFlowEvent event = new WorkFlowEvent(null, workflowId, nextSequence, WorkFlowEvent.EventType.ACTIVITY_FAILED, failureDetails, Instant.now());
-        return workFlowEventRepository.save(event);
+        return appendEvent(workflowId, WorkFlowEvent.EventType.ACTIVITY_FAILED, failureDetails);
     }
 
     public WorkFlowEvent failWorkflow(String workflowId, String failureDetails){
-        List<WorkFlowEvent> history = workFlowEventRepository.findByWorkflowIdOrderBySequenceNumberAsc(workflowId);
-
-        if(history.isEmpty()){
-            throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND, "Workflow " + workflowId + " not found"
-            );
-        }
-        int nextSequence = history.size() + 1;
-
-        WorkFlowEvent event = new WorkFlowEvent(null, workflowId, nextSequence, WorkFlowEvent.EventType.WORKFLOW_FAILED, failureDetails, Instant.now());
-        return workFlowEventRepository.save(event);
+        return appendEvent(workflowId, WorkFlowEvent.EventType.WORKFLOW_FAILED, failureDetails);
     }
 }
