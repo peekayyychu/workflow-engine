@@ -71,12 +71,41 @@ public class WorkFlowEventService {
             switch(event.getEventType()){
                 case WORKFLOW_COMPLETED -> state.setStatus("COMPLETED");
                 case WORKFLOW_FAILED -> state.setStatus("FAILED");
-                case WORKFLOW_STARTED, ACTIVITY_SCHEDULED, ACTIVITY_COMPLETED, ACTIVITY_FAILED -> state.setStatus("RUNNING");
+                case ACTIVITY_FAILED -> state.setStatus("FAILED");
+                case WORKFLOW_STARTED, ACTIVITY_SCHEDULED, ACTIVITY_COMPLETED -> state.setStatus("RUNNING");
                 default -> {
                 }
             }
         }
 
         return state;
+    }
+
+    public WorkFlowEvent failActivity(String workflowId, String activityName, String failureDetails){
+        List<WorkFlowEvent> history = workFlowEventRepository.findByWorkflowIdOrderBySequenceNumberAsc(workflowId);
+
+        if(history.isEmpty()){
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Workflow " + workflowId + " not found"
+            );
+        }
+        int nextSequence = history.size() + 1;
+
+        WorkFlowEvent event = new WorkFlowEvent(null, workflowId, nextSequence, WorkFlowEvent.EventType.ACTIVITY_FAILED, failureDetails, Instant.now());
+        return workFlowEventRepository.save(event);
+    }
+
+    public WorkFlowEvent failWorkflow(String workflowId, String failureDetails){
+        List<WorkFlowEvent> history = workFlowEventRepository.findByWorkflowIdOrderBySequenceNumberAsc(workflowId);
+
+        if(history.isEmpty()){
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "Workflow " + workflowId + " not found"
+            );
+        }
+        int nextSequence = history.size() + 1;
+
+        WorkFlowEvent event = new WorkFlowEvent(null, workflowId, nextSequence, WorkFlowEvent.EventType.WORKFLOW_FAILED, failureDetails, Instant.now());
+        return workFlowEventRepository.save(event);
     }
 }

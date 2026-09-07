@@ -62,4 +62,19 @@ public class WorkFlowController {
     public ResponseEntity<WorkFlowState> getWorkflowState(@PathVariable String workflowId) {
         return ResponseEntity.ok(workFlowEventService.getWorkFlowState(workflowId));
     }
+    
+    @PostMapping("/{workflowId}/activity/{activityName}/fail")
+    public ResponseEntity<WorkFlowEvent> failActivity(
+            @PathVariable String workflowId,
+            @PathVariable String activityName,
+            @RequestBody String payload) {
+        return ResponseEntity.ok(workFlowEventService.failActivity(workflowId, activityName, payload));
+    }
+
+    @PostMapping("/{workflowId}/fail")
+    public ResponseEntity<WorkFlowEvent> failWorkflow(
+            @PathVariable String workflowId,
+            @RequestBody String payload) {
+        return ResponseEntity.ok(workFlowEventService.failWorkflow(workflowId, payload));
+    }
 }
