@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class WorkFlowEventService {
     private WorkFlowEventRepository workFlowEventRepository;
 
     @Retryable (
-        retryFor = { DataIntegrityViolationException.class},
+        retryFor = { DataIntegrityViolationException.class, ObjectOptimisticLockingFailureException.class},
         maxAttempts = 3,
         backoff = @Backoff(delay = 50)
     )
