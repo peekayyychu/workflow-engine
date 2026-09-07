@@ -9,8 +9,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,8 +18,8 @@ import lombok.NoArgsConstructor;
 @Entity 
 @Table (
     name = "workflow_event",
-    indexes = {
-        @Index (name = "idx_wf_seq", columnList = "workflow_id, sequence_number", unique = true)
+    uniqueConstraints = {
+        @UniqueConstraint (name = "uc_wf_seq", columnNames = {"workflow_id", "sequence_number"})
     }
 )
 @Data

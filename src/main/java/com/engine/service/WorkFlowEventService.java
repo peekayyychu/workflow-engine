@@ -4,22 +4,31 @@ import java.time.Instant;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Propagation;
 
 import com.engine.model.WorkFlowEvent;
 import com.engine.model.WorkFlowState;
 import com.engine.repository.WorkFlowEventRepository;
 
-import jakarta.transaction.Transactional;
 
 @Service 
 public class WorkFlowEventService {
     @Autowired 
     private WorkFlowEventRepository workFlowEventRepository;
 
-    @Transactional 
+    @Retryable (
+        retryFor = { DataIntegrityViolationException.class},
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 50)
+    )
+    @Transactional (propagation = Propagation.REQUIRES_NEW)
     public WorkFlowEvent appendEvent(String workflowId, WorkFlowEvent.EventType eventType, String payload) {
         int sequenceNumber = workFlowEventRepository.findTopByWorkflowIdOrderBySequenceNumberDesc(workflowId)
                 .map(event -> event.getSequenceNumber() + 1)
