@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.engine.model.WorkFlowEvent;
+import com.engine.model.WorkFlowState;
 import com.engine.service.WorkFlowEventService;
 
 @RestController 
@@ -55,5 +56,10 @@ public class WorkFlowController {
         @RequestBody String payload
     ){
         return ResponseEntity.ok(workFlowEventService.completeWorkFlow(workflowId, payload));
+    }
+
+    @GetMapping("/{workflowId}/state")
+    public ResponseEntity<WorkFlowState> getWorkflowState(@PathVariable String workflowId) {
+        return ResponseEntity.ok(workFlowEventService.getWorkFlowState(workflowId));
     }
 }
