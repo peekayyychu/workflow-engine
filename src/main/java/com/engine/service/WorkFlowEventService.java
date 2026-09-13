@@ -3,26 +3,27 @@ package com.engine.service;
 import java.time.Instant;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.transaction.annotation.Propagation;
 
 import com.engine.model.WorkFlowEvent;
 import com.engine.model.WorkFlowState;
 import com.engine.repository.WorkFlowEventRepository;
 
+import lombok.RequiredArgsConstructor;
+
 
 @Service 
-public class WorkFlowEventService {
-    @Autowired 
-    private WorkFlowEventRepository workFlowEventRepository;
+@RequiredArgsConstructor 
+public class WorkFlowEventService { 
+    private final WorkFlowEventRepository workFlowEventRepository;
 
     @Retryable (
         retryFor = { DataIntegrityViolationException.class, ObjectOptimisticLockingFailureException.class},
@@ -30,12 +31,12 @@ public class WorkFlowEventService {
         backoff = @Backoff(delay = 50)
     )
     @Transactional (propagation = Propagation.REQUIRES_NEW)
-    public WorkFlowEvent appendEvent(String workflowId, WorkFlowEvent.EventType eventType, String payload) {
+    public WorkFlowEvent appendEvent(String workflowId, String activityName, WorkFlowEvent.EventType eventType, String payload) {
         int sequenceNumber = workFlowEventRepository.findTopByWorkflowIdOrderBySequenceNumberDesc(workflowId)
                 .map(event -> event.getSequenceNumber() + 1)
                 .orElse(1);
 
-        WorkFlowEvent event = new WorkFlowEvent(null, workflowId, sequenceNumber, eventType, payload, Instant.now());
+        WorkFlowEvent event = new WorkFlowEvent(null, workflowId, sequenceNumber, eventType, payload, Instant.now(), activityName);
         return workFlowEventRepository.saveAndFlush(event);
     }
 
@@ -45,16 +46,17 @@ public class WorkFlowEventService {
     }
 
     public WorkFlowEvent recordActivity(String workflowId, String activityName, WorkFlowEvent.EventType eventType, String payload ) {
-        return appendEvent(workflowId, eventType, payload);
+        return appendEvent(workflowId, activityName, eventType, payload);
     }
 
     public WorkFlowEvent completeWorkFlow(String workflowId, String payload){
-        return appendEvent(workflowId, WorkFlowEvent.EventType.WORKFLOW_COMPLETED, payload);
+        return appendEvent(workflowId, null, WorkFlowEvent.EventType.WORKFLOW_COMPLETED, payload);
     }
 
     @Transactional (readOnly = true)
     public WorkFlowState getWorkFlowState(String workflowId){
         List<WorkFlowEvent> events = workFlowEventRepository.findByWorkflowIdOrderBySequenceNumberAsc(workflowId);
+
 
         if(events.isEmpty()){
             throw new ResponseStatusException(
@@ -63,6 +65,8 @@ public class WorkFlowEventService {
         }
 
         WorkFlowState state = new WorkFlowState();
+
+        state.setEvents(events);
 
         state.setWorkflowId(workflowId);
         state.setTotalEvents(events.size());
@@ -86,10 +90,10 @@ public class WorkFlowEventService {
     }
 
     public WorkFlowEvent failActivity(String workflowId, String activityName, String failureDetails){
-        return appendEvent(workflowId, WorkFlowEvent.EventType.ACTIVITY_FAILED, failureDetails);
+        return appendEvent(workflowId, activityName, WorkFlowEvent.EventType.ACTIVITY_FAILED, failureDetails);
     }
 
     public WorkFlowEvent failWorkflow(String workflowId, String failureDetails){
-        return appendEvent(workflowId, WorkFlowEvent.EventType.WORKFLOW_FAILED, failureDetails);
+        return appendEvent(workflowId, null, WorkFlowEvent.EventType.WORKFLOW_FAILED, failureDetails);
     }
 }

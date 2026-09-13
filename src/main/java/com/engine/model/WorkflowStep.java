@@ -1,5 +1,7 @@
 package com.engine.model;
 
-public record WorkflowStep(String stepId, String activityType) {
+import java.util.Map;
+
+public record WorkflowStep(String activityName, Map<String, Object> defaultInput, int retryCount) {
     
 }

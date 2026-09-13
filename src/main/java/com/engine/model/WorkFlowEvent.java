@@ -45,6 +45,9 @@ public class WorkFlowEvent {
 
     @Column(nullable = false, updatable = false)
     private Instant timestamp = Instant.now();
+    
+    @Column(name = "activity_name")
+    private String activityName;
 
     public enum EventType {
         WORKFLOW_STARTED,
@@ -54,4 +57,5 @@ public class WorkFlowEvent {
         WORKFLOW_COMPLETED,
         WORKFLOW_FAILED
     }
+
 }

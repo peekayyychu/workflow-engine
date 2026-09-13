@@ -28,7 +28,7 @@ public class WorkFlowController {
         @RequestBody(required = false) String payload
     ){
         String eventPayload = StringUtils.hasText(payload) ? payload : null;
-        WorkFlowEvent event = workFlowEventService.appendEvent(workflowId, WorkFlowEvent.EventType.WORKFLOW_STARTED, eventPayload);
+        WorkFlowEvent event = workFlowEventService.appendEvent(workflowId, null, WorkFlowEvent.EventType.WORKFLOW_STARTED, eventPayload);
         return ResponseEntity.ok(event);
     }
 
