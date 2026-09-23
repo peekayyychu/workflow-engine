@@ -51,7 +51,8 @@ public class WorkFlowOrchestrator {
                 }
             }
             case WorkFlowDecision.CompleteWorkflow complete -> {
-                workFlowEventService.completeWorkFlow(workflowId, objectMapper.writeValueAsString(complete.output()));
+                String outputJson =  objectMapper.writeValueAsString(complete.output());
+                workFlowEventService.completeWorkFlow(workflowId, outputJson);
             }
             case WorkFlowDecision.FailWorkflow fail -> {
                 workFlowEventService.failWorkflow(workflowId, fail.reason());

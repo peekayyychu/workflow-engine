@@ -50,6 +50,7 @@ public class ActivityWorkerListener {
 
         if(Objects.isNull(handler)){
             workFlowEventService.failActivity(event.workflowId(), event.activityName(), "No handler registered for: " + event.activityName());
+            workFlowOrchestrator.processWorkFlow(event.workflowId(), event.workflowDefinition());
             return;
         }
 
