@@ -1,5 +1,6 @@
 package com.engine.service;
 
+import java.time.Duration;
 import java.util.Map;
 
 import org.springframework.context.ApplicationEventPublisher;
@@ -10,6 +11,7 @@ import com.engine.model.ActivityScheduledEvent;
 import com.engine.model.WorkFlowEvent;
 import com.engine.model.WorkFlowState;
 import com.engine.model.WorkflowDefinition;
+import com.engine.model.WorkFlowEvent.EventType;
 import com.engine.resolver.VariableResolver;
 
 import lombok.RequiredArgsConstructor;
@@ -59,6 +61,23 @@ public class WorkFlowOrchestrator {
             }
             case WorkFlowDecision.Wait wait -> {
                 //wait
+            }
+            case WorkFlowDecision.ScheduleTimer timer -> {
+                workFlowEventService.recordActivity(workflowId, timer.timerId(), EventType.TIMER_STARTED, "{\"durationSeconds\":" + timer.durationInSeconds() + "}");
+
+                Thread.ofVirtual().start(()-> {
+                    try{
+                        Thread.sleep(Duration.ofSeconds(timer.durationInSeconds()));
+
+                        workFlowEventService.recordActivity(workflowId, timer.timerId(), EventType.TIMER_FIRED, "{}");
+
+                        this.processWorkFlow(workflowId, definition);
+                    }catch(InterruptedException e){
+                        Thread.currentThread().interrupt();
+                        workFlowEventService.failActivity(workflowId, timer.timerId(), "Timer interrupted");
+                        this.processWorkFlow(workflowId, definition);
+                    }
+                });
             }
                 
             default -> throw new IllegalStateException("Unexpected value: " + decision);

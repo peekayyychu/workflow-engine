@@ -32,7 +32,7 @@ public class WorkFlowDecisionEngine {
         Map<String, ActivityStatus> activityStatuses = aggregateActivityStatus(state);
 
         for(WorkflowStep step: definition.steps()){
-            ActivityStatus status = activityStatuses.get(step.activityName());
+            ActivityStatus status = activityStatuses.getOrDefault(step.activityName(), ActivityStatus.PENDING);
 
             switch (status){
                 case FAILED -> {
@@ -40,6 +40,10 @@ public class WorkFlowDecisionEngine {
                 }
 
                 case PENDING -> {
+                    if(isTimerStep(step)){
+                        return new WorkFlowDecision.ScheduleTimer(step.activityName(), extractDurationSeconds(step));
+                    }
+                    
                     return new WorkFlowDecision.ScheduleActivity(step.activityName(), step.defaultInput());
                 }
 
@@ -87,4 +91,16 @@ public class WorkFlowDecisionEngine {
         };
     }
 
+    private boolean isTimerStep(WorkflowStep step) {
+        return step.activityName().toUpperCase().startsWith("TIMER") 
+            || step.defaultInput().containsKey("durationSeconds");
+    }
+
+    private long extractDurationSeconds(WorkflowStep step) {
+        Object duration = step.defaultInput().get("durationSeconds");
+        if (duration instanceof Number number) {
+            return number.longValue();
+        }
+        return 0L;
+    }
 }

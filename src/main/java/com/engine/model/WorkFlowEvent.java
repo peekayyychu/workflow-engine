@@ -55,7 +55,9 @@ public class WorkFlowEvent {
         ACTIVITY_COMPLETED,
         ACTIVITY_FAILED,
         WORKFLOW_COMPLETED,
-        WORKFLOW_FAILED
-    }
+        WORKFLOW_FAILED,
+        TIMER_STARTED,
+        TIMER_FIRED
+    };
 
 }

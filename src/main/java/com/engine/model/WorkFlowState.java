@@ -2,6 +2,7 @@ package com.engine.model;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,4 +18,6 @@ public class WorkFlowState {
     private Instant lastUpdated;
     private int totalEvents;
     private List<WorkFlowEvent> events;
+    private Set<String> completedList;
+    private Set<String> pendingTimers;
 }

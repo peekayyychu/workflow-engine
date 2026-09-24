@@ -80,6 +80,13 @@ public class WorkFlowEventService {
                 case WORKFLOW_COMPLETED -> state.setStatus("COMPLETED");
                 case WORKFLOW_FAILED -> state.setStatus("FAILED");
                 case ACTIVITY_FAILED -> state.setStatus("FAILED");
+                case TIMER_STARTED -> {
+                    state.getPendingTimers().add(event.getActivityName());
+                }
+                case TIMER_FIRED -> {
+                    state.getPendingTimers().remove(event.getActivityName());
+                    state.getCompletedList().add(event.getActivityName());
+                }
                 case WORKFLOW_STARTED, ACTIVITY_SCHEDULED, ACTIVITY_COMPLETED -> state.setStatus("RUNNING");
                 default -> {
                 }
