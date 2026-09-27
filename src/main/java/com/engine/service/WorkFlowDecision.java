@@ -8,4 +8,6 @@ public sealed interface WorkFlowDecision {
     record CompleteWorkflow(Map<String, Object> output) implements WorkFlowDecision {}
     record FailWorkflow(String reason) implements WorkFlowDecision {}
     record Wait() implements WorkFlowDecision {}
+    record FireTimer(String timerName) implements WorkFlowDecision{};
+    record ResumeTimer(String timerName, long remainingSeconds) implements WorkFlowDecision{};
 }

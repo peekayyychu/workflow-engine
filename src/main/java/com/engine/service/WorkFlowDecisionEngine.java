@@ -1,23 +1,32 @@
 package com.engine.service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import com.engine.activity.ActivityTimerRegistry;
 import com.engine.model.WorkFlowEvent;
 import com.engine.model.WorkFlowState;
 import com.engine.model.WorkflowDefinition;
 import com.engine.model.WorkflowStep;
 import com.engine.model.enums.ActivityStatus;
 
+import lombok.RequiredArgsConstructor;
+
 
 @Service 
+@RequiredArgsConstructor
 public class WorkFlowDecisionEngine {
+
+    private final ActivityTimerRegistry activityTimerRegistry;
 
     public WorkFlowDecision evaluateDecision(WorkflowDefinition definition, WorkFlowState state){
         List<WorkFlowEvent> events = state.getEvents();
@@ -48,6 +57,29 @@ public class WorkFlowDecisionEngine {
                 }
 
                 case SCHEDULED -> {
+                    if(activityTimerRegistry.isActive(state.getWorkflowId(), step.activityName())){
+                        return new WorkFlowDecision.Wait();
+                    }
+                    
+                    Optional<WorkFlowEvent> timerStartEvent = events.stream()
+                        .filter(e -> e.getEventType().equals(WorkFlowEvent.EventType.TIMER_STARTED))
+                        .filter(e -> step.activityName().equals(e.getActivityName()))
+                        .findFirst();
+
+                    if(timerStartEvent.isPresent()){
+                        long duration = extractDurationSeconds(step);
+                        Instant startedAt = timerStartEvent.get().getTimestamp();
+                        
+                        long elapsedSeconds = Duration.between(startedAt, Instant.now()).getSeconds();
+                        long remainingSeconds = duration - elapsedSeconds;
+
+                        if(remainingSeconds <= 0){
+                            return new WorkFlowDecision.FireTimer(step.activityName());
+                        }else{
+                            return new WorkFlowDecision.ResumeTimer(step.activityName(), remainingSeconds);
+                        }
+                    }
+
                     return new WorkFlowDecision.Wait();
                 }
 

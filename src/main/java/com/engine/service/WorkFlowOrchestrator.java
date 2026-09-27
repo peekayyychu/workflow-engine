@@ -6,12 +6,13 @@ import java.util.Map;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import com.engine.activity.ActivityTimerRegistry;
 import com.engine.exception.UnresolvedVariableException;
 import com.engine.model.ActivityScheduledEvent;
 import com.engine.model.WorkFlowEvent;
+import com.engine.model.WorkFlowEvent.EventType;
 import com.engine.model.WorkFlowState;
 import com.engine.model.WorkflowDefinition;
-import com.engine.model.WorkFlowEvent.EventType;
 import com.engine.resolver.VariableResolver;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class WorkFlowOrchestrator {
     private final ApplicationEventPublisher eventPublisher;
     private final ObjectMapper objectMapper;
     private final VariableResolver variableResolver;
+    private final ActivityTimerRegistry activityTimerRegistry;
     
     public void  processWorkFlow(String workflowId, WorkflowDefinition definition){
         WorkFlowState state;
@@ -79,8 +81,34 @@ public class WorkFlowOrchestrator {
                     }
                 });
             }
+            case WorkFlowDecision.ResumeTimer resume -> {
+                startTimerVirtualThread(workflowId, resume.timerName(), resume.remainingSeconds(), definition);
+            }
                 
             default -> throw new IllegalStateException("Unexpected value: " + decision);
         }
+    }
+
+    private void startTimerVirtualThread(String workflowId, String timerName, long durationSeconds, WorkflowDefinition definition){
+        activityTimerRegistry.register(workflowId, timerName);
+
+        Thread.ofVirtual().start(()->{
+            try{
+                Thread.sleep(Duration.ofSeconds(durationSeconds));
+
+                workFlowEventService.recordActivity(
+                    workflowId,
+                    timerName,
+                    EventType.TIMER_FIRED,
+                    "{}"
+                );
+            }catch(InterruptedException e){
+                Thread.currentThread().interrupt();
+                workFlowEventService.failActivity(workflowId, timerName, "Timer interrupted");
+            }finally{
+                activityTimerRegistry.unregister(workflowId, timerName);
+                this.processWorkFlow(workflowId, definition);
+            }
+        });
     }
 }
