@@ -1,6 +1,6 @@
-2026-09-29 01:44:40,518 - {
+2026-09-29 01:47:22,163 - {
   "method": "POST",
-  "url": "http://localhost:8080/api/v1/workflows/wf-e2e-4953549a/start",
+  "url": "http://localhost:8080/api/v1/workflows/wf-e2e-21bf388b/start",
   "status_code": 401,
   "request_body": {
     "definition": {
@@ -11,13 +11,6 @@
             "userId": "usr_999"
           },
           "retryCount": 1
-        },
-        {
-          "activityName": "TIMER_WAIT_3S",
-          "defaultInput": {
-            "durationSeconds": 3
-          },
-          "retryCount": 0
         },
         {
           "activityName": "sendEmailNotification",
@@ -32,51 +25,37 @@
   },
   "response_body": null
 }
-2026-09-29 01:44:41,045 - {
+2026-09-29 01:47:22,902 - {
   "method": "POST",
-  "url": "http://localhost:8080/api/v1/workflows/wf-e2e-4953549a/activity/fetchUserData/complete",
-  "status_code": 400,
+  "url": "http://localhost:8080/api/v1/workflows/wf-e2e-21bf388b/activity/fetchUserData/complete",
+  "status_code": 401,
   "request_body": "{\"userId\": \"usr_999\", \"status\": \"VERIFIED\"}",
-  "response_body": {
-    "responseMeta": {
-      "status": 400,
-      "message": "Unsupported Content-Type",
-      "success": false
-    },
-    "errorDisplay": ""
-  }
+  "response_body": null
 }
-2026-09-29 01:44:41,058 - {
+2026-09-29 01:47:22,954 - {
   "method": "POST",
-  "url": "http://localhost:8080/api/v1/workflows/wf-e2e-4953549a/activity/sendEmailNotification/fail",
-  "status_code": 400,
+  "url": "http://localhost:8080/api/v1/workflows/wf-e2e-21bf388b/activity/sendEmailNotification/fail",
+  "status_code": 401,
   "request_body": "{\"error\": \"SMTP server connection timeout\"}",
-  "response_body": {
-    "responseMeta": {
-      "status": 400,
-      "message": "Unsupported Content-Type",
-      "success": false
-    },
-    "errorDisplay": ""
-  }
+  "response_body": null
 }
-2026-09-29 01:44:41,171 - {
+2026-09-29 01:47:22,979 - {
   "method": "POST",
-  "url": "http://localhost:8080/api/v1/workflows/wf-e2e-4953549a/resume",
-  "status_code": 403,
-  "request_body": null,
-  "response_body": "Access Denied"
-}
-2026-09-29 01:44:41,193 - {
-  "method": "GET",
-  "url": "http://localhost:8080/api/v1/workflows/wf-e2e-4953549a/state",
+  "url": "http://localhost:8080/api/v1/workflows/wf-e2e-21bf388b/resume",
   "status_code": 401,
   "request_body": null,
   "response_body": null
 }
-2026-09-29 01:44:41,215 - {
+2026-09-29 01:47:23,001 - {
   "method": "GET",
-  "url": "http://localhost:8080/api/v1/workflows/wf-e2e-4953549a/history",
+  "url": "http://localhost:8080/api/v1/workflows/wf-e2e-21bf388b/state",
+  "status_code": 401,
+  "request_body": null,
+  "response_body": null
+}
+2026-09-29 01:47:23,022 - {
+  "method": "GET",
+  "url": "http://localhost:8080/api/v1/workflows/wf-e2e-21bf388b/history",
   "status_code": 401,
   "request_body": null,
   "response_body": null
