@@ -1,6 +1,8 @@
-2026-09-29 01:58:37,491 - {
+2026-09-29 02:03:54,449 - {
+  "step": 1,
+  "step_name": "Start Workflow",
   "method": "POST",
-  "url": "http://localhost:8081/api/v1/workflows/wf-e2e-7058efd4/start",
+  "url": "http://localhost:8081/api/v1/workflows/wf-e2e-e8352375/start",
   "status_code": 200,
   "request_body": {
     "definition": {
@@ -24,226 +26,233 @@
     "payload": "{\"env\": \"staging\", \"initiatedBy\": \"e2e_runner\"}"
   },
   "response_body": {
-    "id": 6,
-    "workflowId": "wf-e2e-7058efd4",
+    "id": 17,
+    "workflowId": "wf-e2e-e8352375",
     "sequenceNumber": 1,
     "eventType": "WORKFLOW_STARTED",
     "payload": "{\"env\": \"staging\", \"initiatedBy\": \"e2e_runner\"}",
-    "timestamp": "2026-09-28T20:28:36.704047200Z",
+    "timestamp": "2026-09-28T20:33:53.863541800Z",
     "activityName": null
   }
 }
-2026-09-29 01:58:38,016 - {
+2026-09-29 02:03:54,986 - {
+  "step": 2,
+  "step_name": "Complete Step 1",
   "method": "POST",
-  "url": "http://localhost:8081/api/v1/workflows/wf-e2e-7058efd4/activity/fetchUserData/complete",
+  "url": "http://localhost:8081/api/v1/workflows/wf-e2e-e8352375/activity/fetchUserData/complete",
   "status_code": 200,
   "request_body": "{\"userId\": \"usr_999\", \"status\": \"VERIFIED\"}",
   "response_body": {
-    "id": 12,
-    "workflowId": "wf-e2e-7058efd4",
+    "id": 23,
+    "workflowId": "wf-e2e-e8352375",
     "sequenceNumber": 7,
     "eventType": "ACTIVITY_COMPLETED",
     "payload": "{\"userId\": \"usr_999\", \"status\": \"VERIFIED\"}",
-    "timestamp": "2026-09-28T20:28:38.002689300Z",
+    "timestamp": "2026-09-28T20:33:54.968918700Z",
     "activityName": "fetchUserData"
   }
 }
-2026-09-29 01:58:38,054 - {
+2026-09-29 02:03:55,044 - {
+  "step": 3,
+  "step_name": "Fail Step 2",
   "method": "POST",
-  "url": "http://localhost:8081/api/v1/workflows/wf-e2e-7058efd4/activity/sendEmailNotification/fail",
-  "status_code": 200,
+  "url": "http://localhost:8081/api/v1/workflows/wf-e2e-e8352375/activity/sendEmailNotification/fail",
+  "status_code": 500,
   "request_body": "{\"error\": \"SMTP server connection timeout\"}",
   "response_body": {
-    "id": 13,
-    "workflowId": "wf-e2e-7058efd4",
-    "sequenceNumber": 8,
-    "eventType": "ACTIVITY_FAILED",
-    "payload": "{\"error\": \"SMTP server connection timeout\"}",
-    "timestamp": "2026-09-28T20:28:38.024456400Z",
-    "activityName": "sendEmailNotification"
+    "timestamp": "2026-09-28T20:33:55.041Z",
+    "status": 500,
+    "error": "Internal Server Error",
+    "path": "/api/v1/workflows/wf-e2e-e8352375/activity/sendEmailNotification/fail"
   }
 }
-2026-09-29 01:58:38,079 - {
+2026-09-29 02:03:55,054 - {
+  "step": 4,
+  "step_name": "Resume Workflow",
   "method": "POST",
-  "url": "http://localhost:8081/api/v1/workflows/wf-e2e-7058efd4/resume",
+  "url": "http://localhost:8081/api/v1/workflows/wf-e2e-e8352375/resume",
   "status_code": 200,
   "request_body": null,
   "response_body": null
 }
-2026-09-29 01:58:38,103 - {
+2026-09-29 02:03:55,070 - {
+  "step": 5,
+  "step_name": "Fetch State",
   "method": "GET",
-  "url": "http://localhost:8081/api/v1/workflows/wf-e2e-7058efd4/state",
+  "url": "http://localhost:8081/api/v1/workflows/wf-e2e-e8352375/state",
   "status_code": 200,
   "request_body": null,
   "response_body": {
-    "workflowId": "wf-e2e-7058efd4",
+    "workflowId": "wf-e2e-e8352375",
     "status": "FAILED",
     "currentSequenceNumber": 8,
-    "lastUpdated": "2026-09-28T20:28:38.024456Z",
+    "lastUpdated": "2026-09-28T20:33:54.995631Z",
     "totalEvents": 8,
     "events": [
       {
-        "id": 6,
-        "workflowId": "wf-e2e-7058efd4",
+        "id": 17,
+        "workflowId": "wf-e2e-e8352375",
         "sequenceNumber": 1,
         "eventType": "WORKFLOW_STARTED",
         "payload": "{\"env\": \"staging\", \"initiatedBy\": \"e2e_runner\"}",
-        "timestamp": "2026-09-28T20:28:36.704047Z",
+        "timestamp": "2026-09-28T20:33:53.863542Z",
         "activityName": null
       },
       {
-        "id": 7,
-        "workflowId": "wf-e2e-7058efd4",
+        "id": 18,
+        "workflowId": "wf-e2e-e8352375",
         "sequenceNumber": 2,
         "eventType": "ACTIVITY_SCHEDULED",
         "payload": "{\"userId\":\"usr_999\"}",
-        "timestamp": "2026-09-28T20:28:37.526993Z",
+        "timestamp": "2026-09-28T20:33:54.486917Z",
         "activityName": "fetchUserData"
       },
       {
-        "id": 8,
-        "workflowId": "wf-e2e-7058efd4",
+        "id": 19,
+        "workflowId": "wf-e2e-e8352375",
         "sequenceNumber": 3,
         "eventType": "ACTIVITY_FAILED",
         "payload": "No handler registered for: fetchUserData",
-        "timestamp": "2026-09-28T20:28:37.539780Z",
+        "timestamp": "2026-09-28T20:33:54.503832Z",
         "activityName": "fetchUserData"
       },
       {
-        "id": 9,
-        "workflowId": "wf-e2e-7058efd4",
+        "id": 20,
+        "workflowId": "wf-e2e-e8352375",
         "sequenceNumber": 4,
         "eventType": "ACTIVITY_SCHEDULED",
         "payload": "{\"userId\":\"usr_999\"}",
-        "timestamp": "2026-09-28T20:28:37.557653Z",
+        "timestamp": "2026-09-28T20:33:54.522796Z",
         "activityName": "fetchUserData"
       },
       {
-        "id": 10,
-        "workflowId": "wf-e2e-7058efd4",
+        "id": 21,
+        "workflowId": "wf-e2e-e8352375",
         "sequenceNumber": 5,
         "eventType": "ACTIVITY_FAILED",
         "payload": "No handler registered for: fetchUserData",
-        "timestamp": "2026-09-28T20:28:37.567617Z",
+        "timestamp": "2026-09-28T20:33:54.533100Z",
         "activityName": "fetchUserData"
       },
       {
-        "id": 11,
-        "workflowId": "wf-e2e-7058efd4",
+        "id": 22,
+        "workflowId": "wf-e2e-e8352375",
         "sequenceNumber": 6,
         "eventType": "WORKFLOW_FAILED",
         "payload": "Activity Failed: fetchUserData failed after: 2 attempts (max retries)",
-        "timestamp": "2026-09-28T20:28:37.584689Z",
+        "timestamp": "2026-09-28T20:33:54.549607Z",
         "activityName": null
       },
       {
-        "id": 12,
-        "workflowId": "wf-e2e-7058efd4",
+        "id": 23,
+        "workflowId": "wf-e2e-e8352375",
         "sequenceNumber": 7,
         "eventType": "ACTIVITY_COMPLETED",
         "payload": "{\"userId\": \"usr_999\", \"status\": \"VERIFIED\"}",
-        "timestamp": "2026-09-28T20:28:38.002689Z",
+        "timestamp": "2026-09-28T20:33:54.968919Z",
         "activityName": "fetchUserData"
       },
       {
-        "id": 13,
-        "workflowId": "wf-e2e-7058efd4",
+        "id": 24,
+        "workflowId": "wf-e2e-e8352375",
         "sequenceNumber": 8,
-        "eventType": "ACTIVITY_FAILED",
-        "payload": "{\"error\": \"SMTP server connection timeout\"}",
-        "timestamp": "2026-09-28T20:28:38.024456Z",
-        "activityName": "sendEmailNotification"
+        "eventType": "WORKFLOW_FAILED",
+        "payload": "Workflow marked as failed in the event history",
+        "timestamp": "2026-09-28T20:33:54.995631Z",
+        "activityName": null
       }
     ],
     "completedList": null,
     "pendingTimers": null
   }
 }
-2026-09-29 01:58:38,118 - {
+2026-09-29 02:03:55,083 - {
+  "step": 6,
+  "step_name": "Fetch History",
   "method": "GET",
-  "url": "http://localhost:8081/api/v1/workflows/wf-e2e-7058efd4/history",
+  "url": "http://localhost:8081/api/v1/workflows/wf-e2e-e8352375/history",
   "status_code": 200,
   "request_body": null,
   "response_body": [
     {
-      "id": 6,
-      "workflowId": "wf-e2e-7058efd4",
+      "id": 17,
+      "workflowId": "wf-e2e-e8352375",
       "sequenceNumber": 1,
       "eventType": "WORKFLOW_STARTED",
       "payload": "{\"env\": \"staging\", \"initiatedBy\": \"e2e_runner\"}",
-      "timestamp": "2026-09-28T20:28:36.704047Z",
+      "timestamp": "2026-09-28T20:33:53.863542Z",
       "activityName": null
     },
     {
-      "id": 7,
-      "workflowId": "wf-e2e-7058efd4",
+      "id": 18,
+      "workflowId": "wf-e2e-e8352375",
       "sequenceNumber": 2,
       "eventType": "ACTIVITY_SCHEDULED",
       "payload": "{\"userId\":\"usr_999\"}",
-      "timestamp": "2026-09-28T20:28:37.526993Z",
+      "timestamp": "2026-09-28T20:33:54.486917Z",
       "activityName": "fetchUserData"
     },
     {
-      "id": 8,
-      "workflowId": "wf-e2e-7058efd4",
+      "id": 19,
+      "workflowId": "wf-e2e-e8352375",
       "sequenceNumber": 3,
       "eventType": "ACTIVITY_FAILED",
       "payload": "No handler registered for: fetchUserData",
-      "timestamp": "2026-09-28T20:28:37.539780Z",
+      "timestamp": "2026-09-28T20:33:54.503832Z",
       "activityName": "fetchUserData"
     },
     {
-      "id": 9,
-      "workflowId": "wf-e2e-7058efd4",
+      "id": 20,
+      "workflowId": "wf-e2e-e8352375",
       "sequenceNumber": 4,
       "eventType": "ACTIVITY_SCHEDULED",
       "payload": "{\"userId\":\"usr_999\"}",
-      "timestamp": "2026-09-28T20:28:37.557653Z",
+      "timestamp": "2026-09-28T20:33:54.522796Z",
       "activityName": "fetchUserData"
     },
     {
-      "id": 10,
-      "workflowId": "wf-e2e-7058efd4",
+      "id": 21,
+      "workflowId": "wf-e2e-e8352375",
       "sequenceNumber": 5,
       "eventType": "ACTIVITY_FAILED",
       "payload": "No handler registered for: fetchUserData",
-      "timestamp": "2026-09-28T20:28:37.567617Z",
+      "timestamp": "2026-09-28T20:33:54.533100Z",
       "activityName": "fetchUserData"
     },
     {
-      "id": 11,
-      "workflowId": "wf-e2e-7058efd4",
+      "id": 22,
+      "workflowId": "wf-e2e-e8352375",
       "sequenceNumber": 6,
       "eventType": "WORKFLOW_FAILED",
       "payload": "Activity Failed: fetchUserData failed after: 2 attempts (max retries)",
-      "timestamp": "2026-09-28T20:28:37.584689Z",
+      "timestamp": "2026-09-28T20:33:54.549607Z",
       "activityName": null
     },
     {
-      "id": 12,
-      "workflowId": "wf-e2e-7058efd4",
+      "id": 23,
+      "workflowId": "wf-e2e-e8352375",
       "sequenceNumber": 7,
       "eventType": "ACTIVITY_COMPLETED",
       "payload": "{\"userId\": \"usr_999\", \"status\": \"VERIFIED\"}",
-      "timestamp": "2026-09-28T20:28:38.002689Z",
+      "timestamp": "2026-09-28T20:33:54.968919Z",
       "activityName": "fetchUserData"
     },
     {
-      "id": 13,
-      "workflowId": "wf-e2e-7058efd4",
+      "id": 24,
+      "workflowId": "wf-e2e-e8352375",
       "sequenceNumber": 8,
-      "eventType": "ACTIVITY_FAILED",
-      "payload": "{\"error\": \"SMTP server connection timeout\"}",
-      "timestamp": "2026-09-28T20:28:38.024456Z",
-      "activityName": "sendEmailNotification"
+      "eventType": "WORKFLOW_FAILED",
+      "payload": "Workflow marked as failed in the event history",
+      "timestamp": "2026-09-28T20:33:54.995631Z",
+      "activityName": null
     },
     {
-      "id": 15,
-      "workflowId": "wf-e2e-7058efd4",
+      "id": 26,
+      "workflowId": "wf-e2e-e8352375",
       "sequenceNumber": 9,
       "eventType": "WORKFLOW_FAILED",
       "payload": "Workflow marked as failed in the event history",
-      "timestamp": "2026-09-28T20:28:38.090448Z",
+      "timestamp": "2026-09-28T20:33:55.063298Z",
       "activityName": null
     }
   ]

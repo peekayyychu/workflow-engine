@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Workflow Execution Graph</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'forest' });
+    </script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; background-color: #f9f9f9; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 25px; }
+        h2 { color: #333; margin-top: 0; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Workflow Execution & Interaction Report</h1>
+    <p><b>Workflow Instance ID:</b> wf-e2e-e8352375</p>
+
+    <div class="card">
+        <h2>1. Interaction Sequence Diagram</h2>
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Runner as E2E Test Runner
+    participant Orchestrator as Spring Boot API
+    Runner->>Orchestrator: POST /wf-e2e-e8352375/start
+    Orchestrator-->>Runner: Response Code 200 (OK)
+    Runner->>Orchestrator: POST /wf-e2e-e8352375/activity/fetchUserData/complete
+    Orchestrator-->>Runner: Response Code 200 (OK)
+    Runner->>Orchestrator: POST /wf-e2e-e8352375/activity/sendEmailNotification/fail
+    Orchestrator-->>Runner: Response Code 500 (FAIL)
+    Runner->>Orchestrator: POST /wf-e2e-e8352375/resume
+    Orchestrator-->>Runner: Response Code 200 (OK)
+    Runner->>Orchestrator: GET /wf-e2e-e8352375/state
+    Orchestrator-->>Runner: Response Code 200 (OK)
+    Runner->>Orchestrator: GET /wf-e2e-e8352375/history
+    Orchestrator-->>Runner: Response Code 200 (OK)
+        </pre>
+    </div>
+
+    <div class="card">
+        <h2>2. Workflow Activity State Flow</h2>
+        <pre class="mermaid">
+graph LR
+    A[Start Workflow] --> B[Activity: fetchUserData]
+    B -->|Verified| C[Activity: sendEmailNotification]
+    C -->|SMTP Timeout| D[Resume Engine]
+    D --> E[Fetch Audit State & History]
+
+    style A fill:#bbdefb,stroke:#1565c0,stroke-width:2px
+    style B fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style C fill:#ffcdd2,stroke:#c62828,stroke-width:2px
+    style D fill:#ffe0b2,stroke:#ef6c00,stroke-width:2px
+    style E fill:#e1bee7,stroke:#6a1b9a,stroke-width:2px
+        </pre>
+    </div>
+</body>
+</html>

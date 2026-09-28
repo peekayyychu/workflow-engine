@@ -1,0 +1,1 @@
+2026-09-29 02:03:55,045 - [ERROR] - API Call Failed: POST http://localhost:8081/api/v1/workflows/wf-e2e-e8352375/activity/sendEmailNotification/fail | Status: 500 | Body: {"timestamp":"2026-09-28T20:33:55.041Z","status":500,"error":"Internal Server Error","path":"/api/v1/workflows/wf-e2e-e8352375/activity/sendEmailNotification/fail"}
