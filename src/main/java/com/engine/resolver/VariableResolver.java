@@ -21,15 +21,17 @@ import tools.jackson.databind.ObjectMapper;
 
 import com.engine.model.WorkFlowEvent.EventType;
 
+import lombok.RequiredArgsConstructor;
+
 @Component 
+@RequiredArgsConstructor 
 public class VariableResolver {
     private static final Pattern EXPRESSION_PATTERN = 
         Pattern.compile("\\$\\{([a-zA-Z0-9_-]+)\\.([^}]+)\\}");
 
     private static final Pattern PURE_EXPRESSION_PATTERN = 
         Pattern.compile("^\\$\\{([a-zA-Z0-9_-]+)\\.([^}]+)\\}$");
-
-    @Autowired 
+ 
     private ObjectMapper objectMapper;
 
     public Map<String, Object> resolve(Map<String, Object> rawInput, WorkFlowState state, String workflowId, String currentStep){

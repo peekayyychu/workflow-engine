@@ -9,7 +9,6 @@ import jakarta.annotation.PostConstruct;
 
 import tools.jackson.databind.ObjectMapper;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -20,21 +19,20 @@ import com.engine.model.WorkFlowEvent.EventType;
 import com.engine.service.WorkFlowEventService;
 import com.engine.service.WorkFlowOrchestrator;
 
+import lombok.RequiredArgsConstructor;
+
 @Component
+@RequiredArgsConstructor 
 public class ActivityWorkerListener {
-    @Autowired 
     List<ActivityHandler> handlers;
     
     private Map<String, ActivityHandler> handlerRegistry;
 
-    @Autowired 
-    private WorkFlowEventService workFlowEventService;
+    private final WorkFlowEventService workFlowEventService;
 
-    @Autowired 
     @Lazy 
     private WorkFlowOrchestrator workFlowOrchestrator;
 
-    @Autowired 
     private ObjectMapper objectMapper;
 
     @PostConstruct 
