@@ -11,7 +11,7 @@ import tools.jackson.databind.ObjectMapper;
 
 @Service 
 @RequiredArgsConstructor 
-public class RedisWorkflowDefinitionRegistry implements WorkflowDefintionRegistry{
+public class RedisWorkflowDefinitionRegistry implements WorkflowDefinitionRegistry{
 
     private static final String TEMPLATE_PREFIX = "wf:template:";
     private static final String INSTANCE_PREFIX = "wf:instance:";

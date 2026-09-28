@@ -14,21 +14,23 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.engine.model.WorkFlowEvent;
 import com.engine.model.WorkFlowState;
+import com.engine.model.WorkflowDefinition;
 import com.engine.model.request.WorkFlowStartRequest;
+import com.engine.registry.WorkflowDefinitionRegistry;
 import com.engine.service.WorkFlowEventService;
 import com.engine.service.WorkFlowOrchestrator;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController 
 @RequestMapping ("/api/v1/workflows/{workflowId}")
+@RequiredArgsConstructor 
 public class WorkFlowController {
     private final WorkFlowEventService workFlowEventService;
 
     private final WorkFlowOrchestrator workFlowOrchestrator;
 
-    WorkFlowController(WorkFlowOrchestrator workFlowOrchestrator, WorkFlowEventService workFlowEventService) {
-        this.workFlowOrchestrator = workFlowOrchestrator;
-        this.workFlowEventService = workFlowEventService;
-    }
+    private final WorkflowDefinitionRegistry definitionRegistry;
 
     @PostMapping("/start")
     public ResponseEntity<WorkFlowEvent> startWorkflow(
@@ -38,7 +40,8 @@ public class WorkFlowController {
         String eventPayload = StringUtils.hasText(request.payload()) ? request.payload() : null;
         WorkFlowEvent event = workFlowEventService.appendEvent(workflowId, null, WorkFlowEvent.EventType.WORKFLOW_STARTED, eventPayload);
 
-        if(Objects.nonNull(request.definition())){
+        if(Objects.nonNull(request) && Objects.nonNull(request.definition())){
+            definitionRegistry.associateInstance(workflowId, request.definition());
             Thread.ofVirtual().start(()->{
                 workFlowOrchestrator.processWorkFlow(workflowId, request.definition());
             });
@@ -46,6 +49,21 @@ public class WorkFlowController {
         
         return ResponseEntity.ok(event);
     }
+
+    @PostMapping("/resume")
+    public ResponseEntity<Void> resumeWorkflow(@PathVariable String workflowId) {
+        WorkflowDefinition definition = definitionRegistry.getForInstance(workflowId);
+        if(Objects.isNull(definition)){
+            return ResponseEntity.notFound().build();
+        }
+
+        Thread.ofVirtual().start(()->{
+            workFlowOrchestrator.processWorkFlow(workflowId, definition);
+        });
+
+        return ResponseEntity.ok().build();
+    }
+    
 
     @GetMapping ("/history")
     public ResponseEntity<List<WorkFlowEvent>> getWorkflowHistory(
@@ -62,6 +80,7 @@ public class WorkFlowController {
     ){
         String eventPayload = StringUtils.hasText(payload) ? payload : null;
         WorkFlowEvent event = workFlowEventService.recordActivity(workflowId, activityName, WorkFlowEvent.EventType.ACTIVITY_COMPLETED, eventPayload);
+        retriggerOrchestrator(workflowId);
         return ResponseEntity.ok(event);
     }
 
@@ -82,8 +101,11 @@ public class WorkFlowController {
     public ResponseEntity<WorkFlowEvent> failActivity(
             @PathVariable String workflowId,
             @PathVariable String activityName,
-            @RequestBody String payload) {
-        return ResponseEntity.ok(workFlowEventService.failActivity(workflowId, activityName, payload));
+            @RequestBody String payload) 
+    {
+        WorkFlowEvent event = workFlowEventService.failActivity(workflowId, activityName, payload);
+        retriggerOrchestrator(workflowId);
+        return ResponseEntity.ok(event);
     }
 
     @PostMapping("/fail")
@@ -91,5 +113,14 @@ public class WorkFlowController {
             @PathVariable String workflowId,
             @RequestBody String payload) {
         return ResponseEntity.ok(workFlowEventService.failWorkflow(workflowId, payload));
+    }
+
+    private void retriggerOrchestrator(String workflowId){
+        WorkflowDefinition definition = definitionRegistry.getForInstance(workflowId);
+        if(Objects.nonNull(definition)){
+            Thread.ofVirtual().start(()->{
+                workFlowOrchestrator.processWorkFlow(workflowId, definition);
+            });
+        }
     }
 }
