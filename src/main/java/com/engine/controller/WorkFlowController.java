@@ -1,8 +1,8 @@
 package com.engine.controller;
 
 import java.util.List;
+import java.util.Objects;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,32 +14,47 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.engine.model.WorkFlowEvent;
 import com.engine.model.WorkFlowState;
+import com.engine.model.request.WorkFlowStartRequest;
 import com.engine.service.WorkFlowEventService;
+import com.engine.service.WorkFlowOrchestrator;
 
 @RestController 
-@RequestMapping ("/api/v1/workflows")
+@RequestMapping ("/api/v1/workflows/{workflowId}")
 public class WorkFlowController {
-    @Autowired 
-    private WorkFlowEventService workFlowEventService;
+    private final WorkFlowEventService workFlowEventService;
 
-    @PostMapping("/{workflowId}/start")
+    private final WorkFlowOrchestrator workFlowOrchestrator;
+
+    WorkFlowController(WorkFlowOrchestrator workFlowOrchestrator, WorkFlowEventService workFlowEventService) {
+        this.workFlowOrchestrator = workFlowOrchestrator;
+        this.workFlowEventService = workFlowEventService;
+    }
+
+    @PostMapping("/start")
     public ResponseEntity<WorkFlowEvent> startWorkflow(
         @PathVariable String workflowId,
-        @RequestBody(required = false) String payload
+        @RequestBody(required = false) WorkFlowStartRequest request
     ){
-        String eventPayload = StringUtils.hasText(payload) ? payload : null;
+        String eventPayload = StringUtils.hasText(request.payload()) ? request.payload() : null;
         WorkFlowEvent event = workFlowEventService.appendEvent(workflowId, null, WorkFlowEvent.EventType.WORKFLOW_STARTED, eventPayload);
+
+        if(Objects.nonNull(request.definition())){
+            Thread.ofVirtual().start(()->{
+                workFlowOrchestrator.processWorkFlow(workflowId, request.definition());
+            });
+        }
+        
         return ResponseEntity.ok(event);
     }
 
-    @GetMapping ("/{workflowId}/history")
+    @GetMapping ("/history")
     public ResponseEntity<List<WorkFlowEvent>> getWorkflowHistory(
         @PathVariable String workflowId
     ){  
         return ResponseEntity.ok(workFlowEventService.getEventsByWorkflowId(workflowId));
     }
 
-    @PostMapping ("/{workflowId}/activity/{activityName}/complete")
+    @PostMapping ("/activity/{activityName}/complete")
     public ResponseEntity<WorkFlowEvent> completeActivity(
         @PathVariable String workflowId,
         @PathVariable String activityName,
@@ -50,7 +65,7 @@ public class WorkFlowController {
         return ResponseEntity.ok(event);
     }
 
-    @PostMapping ("/{workflowId}/complete")
+    @PostMapping ("/complete")
     public ResponseEntity<WorkFlowEvent> completeWorkflow(
         @PathVariable String workflowId,
         @RequestBody String payload
@@ -58,12 +73,12 @@ public class WorkFlowController {
         return ResponseEntity.ok(workFlowEventService.completeWorkFlow(workflowId, payload));
     }
 
-    @GetMapping("/{workflowId}/state")
+    @GetMapping("/state")
     public ResponseEntity<WorkFlowState> getWorkflowState(@PathVariable String workflowId) {
         return ResponseEntity.ok(workFlowEventService.getWorkFlowState(workflowId));
     }
     
-    @PostMapping("/{workflowId}/activity/{activityName}/fail")
+    @PostMapping("/activity/{activityName}/fail")
     public ResponseEntity<WorkFlowEvent> failActivity(
             @PathVariable String workflowId,
             @PathVariable String activityName,
@@ -71,7 +86,7 @@ public class WorkFlowController {
         return ResponseEntity.ok(workFlowEventService.failActivity(workflowId, activityName, payload));
     }
 
-    @PostMapping("/{workflowId}/fail")
+    @PostMapping("/fail")
     public ResponseEntity<WorkFlowEvent> failWorkflow(
             @PathVariable String workflowId,
             @RequestBody String payload) {
