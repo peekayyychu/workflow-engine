@@ -45,7 +45,13 @@ public class WorkFlowDecisionEngine {
 
             switch (status){
                 case FAILED -> {
-                    return new WorkFlowDecision.FailWorkflow("Activity Failed: " + step.activityName());
+                    long failureCount = countFailures(events, step.activityName());
+
+                    if(failureCount <= step.retryCount()){
+                        return new WorkFlowDecision.ScheduleActivity(step.activityName(), step.defaultInput());
+                    }
+
+                    return new WorkFlowDecision.FailWorkflow("Activity Failed: " + step.activityName() + " failed after: " + failureCount + " attempts (max retries)");
                 }
 
                 case PENDING -> {
@@ -134,5 +140,12 @@ public class WorkFlowDecisionEngine {
             return number.longValue();
         }
         return 0L;
+    }
+
+    private long countFailures(List<WorkFlowEvent> events, String activityName){
+        return events.stream()
+            .filter(event->event.getEventType().equals(WorkFlowEvent.EventType.ACTIVITY_FAILED))
+            .filter(event->activityName.equals(event.getActivityName()))
+            .count();
     }
 }
