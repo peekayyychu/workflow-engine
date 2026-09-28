@@ -1,0 +1,6 @@
+2026-09-29 01:44:40,518 - [ERROR] - API Call Failed: POST http://localhost:8080/api/v1/workflows/wf-e2e-4953549a/start | Status: 401 | Body: 
+2026-09-29 01:44:41,045 - [ERROR] - API Call Failed: POST http://localhost:8080/api/v1/workflows/wf-e2e-4953549a/activity/fetchUserData/complete | Status: 400 | Body: {"responseMeta":{"status":400,"message":"Unsupported Content-Type","success":false},"errorDisplay":""}
+2026-09-29 01:44:41,058 - [ERROR] - API Call Failed: POST http://localhost:8080/api/v1/workflows/wf-e2e-4953549a/activity/sendEmailNotification/fail | Status: 400 | Body: {"responseMeta":{"status":400,"message":"Unsupported Content-Type","success":false},"errorDisplay":""}
+2026-09-29 01:44:41,172 - [ERROR] - API Call Failed: POST http://localhost:8080/api/v1/workflows/wf-e2e-4953549a/resume | Status: 403 | Body: Access Denied
+2026-09-29 01:44:41,193 - [ERROR] - API Call Failed: GET http://localhost:8080/api/v1/workflows/wf-e2e-4953549a/state | Status: 401 | Body: 
+2026-09-29 01:44:41,216 - [ERROR] - API Call Failed: GET http://localhost:8080/api/v1/workflows/wf-e2e-4953549a/history | Status: 401 | Body: 

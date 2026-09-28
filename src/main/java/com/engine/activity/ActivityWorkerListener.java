@@ -5,10 +5,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import jakarta.annotation.PostConstruct;
-
-import tools.jackson.databind.ObjectMapper;
-
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -19,26 +15,34 @@ import com.engine.model.WorkFlowEvent.EventType;
 import com.engine.service.WorkFlowEventService;
 import com.engine.service.WorkFlowOrchestrator;
 
-import lombok.RequiredArgsConstructor;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
-@RequiredArgsConstructor 
-public class ActivityWorkerListener {
-    List<ActivityHandler> handlers;
-    
-    private Map<String, ActivityHandler> handlerRegistry;
+public class ActivityWorkerListener {    
+    private final Map<String, ActivityHandler> handlerRegistry;
 
     private final WorkFlowEventService workFlowEventService;
+ 
+    private final WorkFlowOrchestrator workFlowOrchestrator;
 
-    @Lazy 
-    private WorkFlowOrchestrator workFlowOrchestrator;
+    private final ObjectMapper objectMapper;
 
-    private ObjectMapper objectMapper;
+    public ActivityWorkerListener(
+        List<ActivityHandler> handlers,
+        WorkFlowEventService workFlowEventService,
+        @Lazy WorkFlowOrchestrator workFlowOrchestrator,
+        ObjectMapper objectMapper
+    ){
+        this.workFlowEventService = workFlowEventService;
+        this.workFlowOrchestrator = workFlowOrchestrator;
+        this.objectMapper = objectMapper;
 
-    @PostConstruct 
-    public void init(){
         this.handlerRegistry = handlers.stream()
-            .collect(Collectors.toMap(ActivityHandler::getActivityName, h->h));
+            .collect(Collectors.toMap(
+                ActivityHandler::getActivityName,
+                handler -> handler,
+                (existing, replacement) -> existing // Prevent duplicate key crashes
+            ));
     }
 
     @Async 
