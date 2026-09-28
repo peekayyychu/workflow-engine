@@ -8,7 +8,7 @@ import requests
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-BASE_URL = "http://localhost:8080/api/v1/workflows"
+BASE_URL = "http://localhost:8081/api/v1/workflows"
 WORKFLOW_ID = f"wf-e2e-{uuid.uuid4().hex[:8]}"
 
 # Logger 1: Stores all API request/response payloads
